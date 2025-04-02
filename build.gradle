@@ -2,10 +2,12 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "com.vanniktech.maven.publish" version "0.28.0" // 대체 플러그인
+    id 'signing' // GPG 서명을 위한 플러그인 추가
 }
 
-group = 'com.graphql'
-version = '0.0.1-SNAPSHOT'
+group = 'io.github.graphql-spring'
+version = '1.0.0'
 
 java {
     toolchain {
@@ -18,11 +20,73 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-graphql:3.4.4'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+import com.vanniktech.maven.publish.SonatypeHost
+
+mavenPublishing {
+
+}
+
+tasks.withType(Javadoc) {
+    options {
+        encoding 'UTF-8'
+    }
+}
+
+signing {
+    sign publishing.publications
+}
+
+mavenPublishing {
+    signAllPublications() // Gpg 서명을 위한 설정
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    coordinates("io.github.graphql-spring", "graphql-spring-handler-method", "1.0.0") // 네임 스페이스, 라이브러리 이름, 버전 순서로 작성
+
+    // POM 설정
+    pom {
+        /**
+         name = '[라이브러리 이름]'
+         description = '[라이브러리 설명]'
+         url = '[오픈소스 Repository Url]'
+         */
+        name = 'graphql-spring-handler-method'
+        description = 'SpringBoot Library For GraphQL Handler Method'
+        url = '<https://github.com/dami325/excel-utils>'
+
+        // 라이선스 정보
+        licenses {
+            license {
+                name = 'Apache License'
+                url = '<https://github.com/graphql-spring/graphql-spring-handler-method/blob/master/LICENSE>'
+            }
+        }
+
+        // 개발자 정보
+        developers {
+            developer {
+                id = 'YunChan-Oh'
+                name = 'Yunchan Oh'
+                email = 'oyunchan9@gmail.com'
+            }
+            // 다른 개발자 정보 추가 가능...
+        }
+
+        /**
+         connection = 'scm:git:github.com/[Github 사용자명]/[오픈소스 Repository 이름].git'
+         developerConnection = 'scm:git:ssh://github.com/[Github 사용자명]/[오픈소스 Repository 이름].git'
+         url = '<https://github.com/>[Github 사용자명]/[오픈소스 Repository 이름]/tree/[배포 브랜치명]'
+         */
+        scm {
+            connection = 'scm:git:github.com/graphql-spring/graphql-spring-handler-method.git'
+            developerConnection = 'scm:git:ssh://github.com:graphql-spring/graphql-spring-handler-method.git'
+            url = '<https://github.com/graphql-spring/graphql-spring-handler-method/tree/master>'
+        }
+    }
 }
